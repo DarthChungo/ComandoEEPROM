@@ -1,6 +1,6 @@
 {
   "name": "comando",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A simple node package to remotelly controll my EEPROM programmet through the serial port.",
   "main": "comando.js",
   "scripts": {

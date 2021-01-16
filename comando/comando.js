@@ -11,8 +11,6 @@ function PrintHelp() {
     console.log(' -p, --port=PORT     Specify port.');
     console.log(' -s, --send=FILE     Send a file to the EEPROMs.');
     console.log(' -r, --recieve=FILE  Recieve to file from EEPROMS.');
-    console.log(' -a, --ascii         Use ascii format instead of binary.');
-    console.log(' -n, --no-check      Avoid check of written data.')
 }
 
 console.log(args);
