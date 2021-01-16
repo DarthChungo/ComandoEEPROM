@@ -1,0 +1,15 @@
+{
+  "name": "comando",
+  "version": "1.0.0",
+  "description": "A simple node package to remotelly controll my EEPROM programmet through the serial port.",
+  "main": "comando.js",
+  "scripts": {
+    "start": "node comando.js"
+  },
+  "author": "Antonio de Haro",
+  "license": "MIT",
+  "dependencies": {
+    "command-line-parser": "^0.1.10",
+    "serialport": "^9.0.4"
+  }
+}

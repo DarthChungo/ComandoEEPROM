@@ -1,0 +1,7 @@
+{
+    "programmer": "Atmel-ICE (AVR)",
+    "board": "arduino:avr:nano",
+    "configuration": "cpu=atmega328old",
+    "port": "/dev/ttyUSB0",
+    "sketch": "controller/controller.ino"
+}
