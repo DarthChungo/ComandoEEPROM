@@ -93,11 +93,11 @@ parser.on('data', data => {
 
             if (options['recieve']) {
                 serial.write([0x11, 0x00]);
-                console.log('[Comando] Initiated READ handshake, please wait');
+                console.log('[Comando] Initiated READ handshake');
             }
 
         } else if (data[0] == 0x02 && data[1] == 0x00) {
-            console.log('[Comando] Recieving READ data')
+            console.log('[Comando] Recieving READ data, please wait')
             receiving = true;
         }
     }
