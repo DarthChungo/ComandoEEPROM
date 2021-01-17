@@ -9,6 +9,7 @@
   "author": "Antonio de Haro",
   "license": "MIT",
   "dependencies": {
+    "@serialport/parser-byte-length": "^9.0.1",
     "command-line-parser": "^0.1.10",
     "serialport": "^9.0.4"
   }

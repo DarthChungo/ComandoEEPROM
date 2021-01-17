@@ -17,22 +17,24 @@ public:
            const uint8_t data2_pin, const uint8_t data3_pin, const uint8_t data4_pin, const uint8_t data5_pin,
            const uint8_t data6_pin, const uint8_t data7_pin);
 
-    void next();
+    void init();
 
-    WORD read();
-    void write(WORD data);
-
-    WORD* read_full();
-    void write_full(WORD* data);
+    void read(word_t* dest);
+    void write(word_t* data);
 
     uint8_t addr = 0;
 
 private:
-    BYTE read_low();
-    BYTE read_high();
+    void next();
 
-    void write_low(BYTE data);
-    void write_high(BYTE data);
+    word_t read_word();
+    void write_word(word_t data);
+
+    byte_t read_low();
+    byte_t read_high();
+
+    void write_low(byte_t data);
+    void write_high(byte_t data);
 
     uint8_t _addr_clk = 0;
     uint8_t _addr_next = 0;
@@ -65,7 +67,10 @@ EEPROM::EEPROM(const uint8_t clk_pin, const uint8_t next_pin, const uint8_t lin_
                _data2(data2_pin), _data3(data3_pin), _data4(data4_pin), _data5(data5_pin),
                _data6(data6_pin), _data7(data7_pin)
     {
+        
+}
 
+void EEPROM::init() {
     pinMode(_addr_clk, OUTPUT);
     pinMode(_addr_next, OUTPUT);
 
@@ -100,6 +105,24 @@ EEPROM::EEPROM(const uint8_t clk_pin, const uint8_t next_pin, const uint8_t lin_
     delay(TIMEOUT_READY);
 }
 
+void EEPROM::read(word_t* dest) {
+    uint8_t i = 0x00;
+
+    do {
+        *(dest + i) = read_word();
+        next();
+    } while (i++ < 0xFF);
+}
+
+void EEPROM::write(word_t* data) {
+    uint8_t i = 0x00;
+
+    do {
+        write_word(data[i]);
+        next();
+    } while (i++ < 0xFF);
+}
+
 void EEPROM::next() {
     digitalWrite(_addr_next, HIGH);
     digitalWrite(_addr_clk, HIGH);
@@ -112,78 +135,34 @@ void EEPROM::next() {
     addr++;
 }
 
-WORD EEPROM::read() {
-    WORD out = 0;
-
-    BYTE high = read_low();
+word_t EEPROM::read_word() {
+    byte_t high = read_low();
     delay(TIMEOUT_ACTION);
 
-    BYTE low = read_high();
+    byte_t low = read_high();
     delay(TIMEOUT_ACTION);
 
-    out = (low << 8) | high;
-
-    Serial.print("MSG RD ");
-    Serial.print(BIN7(addr    ) ? "1" : "0");
-    Serial.print(BIN6(addr    ) ? "1" : "0");
-    Serial.print(BIN5(addr    ) ? "1" : "0");
-    Serial.print(BIN4(addr    ) ? "1" : "0");
-    Serial.print(BIN3(addr    ) ? "1" : "0");
-    Serial.print(BIN2(addr    ) ? "1" : "0");
-    Serial.print(BIN1(addr    ) ? "1" : "0");
-    Serial.print(BIN0(addr    ) ? "1" : "0");
+#ifdef EEPROM_VERBOSE_OP
+    Serial.print("RD ");
+    print_byte(addr);
     Serial.print(" ");
-    Serial.print(BIN7(out >> 8) ? "1" : "0");
-    Serial.print(BIN6(out >> 8) ? "1" : "0");
-    Serial.print(BIN5(out >> 8) ? "1" : "0");
-    Serial.print(BIN4(out >> 8) ? "1" : "0");
-    Serial.print(BIN3(out >> 8) ? "1" : "0");
-    Serial.print(BIN2(out >> 8) ? "1" : "0");
-    Serial.print(BIN1(out >> 8) ? "1" : "0");
-    Serial.print(BIN0(out >> 8) ? "1" : "0");
+    print_byte(high);
     Serial.print(" ");
-    Serial.print(BIN7(out     ) ? "1" : "0");
-    Serial.print(BIN6(out     ) ? "1" : "0");
-    Serial.print(BIN5(out     ) ? "1" : "0");
-    Serial.print(BIN4(out     ) ? "1" : "0");
-    Serial.print(BIN3(out     ) ? "1" : "0");
-    Serial.print(BIN2(out     ) ? "1" : "0");
-    Serial.print(BIN1(out     ) ? "1" : "0");
-    Serial.print(BIN0(out     ) ? "1" : "0");
+    print_byte(low);
     Serial.println("");
+#endif
 
-    return out;
+    return (low << 8) | high;
 }
 
-void EEPROM::write(WORD data) {
-    Serial.print("MSG WT ");
-    Serial.print(BIN7(addr     ) ? "1" : "0");
-    Serial.print(BIN6(addr     ) ? "1" : "0");
-    Serial.print(BIN5(addr     ) ? "1" : "0");
-    Serial.print(BIN4(addr     ) ? "1" : "0");
-    Serial.print(BIN3(addr     ) ? "1" : "0");
-    Serial.print(BIN2(addr     ) ? "1" : "0");
-    Serial.print(BIN1(addr     ) ? "1" : "0");
-    Serial.print(BIN0(addr     ) ? "1" : "0");
+void EEPROM::write_word(word_t data) {
+#ifdef EEPROM_VERBOSE_OP
+    Serial.print("WT ");
+    print_byte(addr);
     Serial.print(" ");
-    Serial.print(BIN7(data >> 8) ? "1" : "0");
-    Serial.print(BIN6(data >> 8) ? "1" : "0");
-    Serial.print(BIN5(data >> 8) ? "1" : "0");
-    Serial.print(BIN4(data >> 8) ? "1" : "0");
-    Serial.print(BIN3(data >> 8) ? "1" : "0");
-    Serial.print(BIN2(data >> 8) ? "1" : "0");
-    Serial.print(BIN1(data >> 8) ? "1" : "0");
-    Serial.print(BIN0(data >> 8) ? "1" : "0");
-    Serial.print(" ");
-    Serial.print(BIN7(data     ) ? "1" : "0");
-    Serial.print(BIN6(data     ) ? "1" : "0");
-    Serial.print(BIN5(data     ) ? "1" : "0");
-    Serial.print(BIN4(data     ) ? "1" : "0");
-    Serial.print(BIN3(data     ) ? "1" : "0");
-    Serial.print(BIN2(data     ) ? "1" : "0");
-    Serial.print(BIN1(data     ) ? "1" : "0");
-    Serial.print(BIN0(data     ) ? "1" : "0");
+    print_word(data);
     Serial.println("");
+#endif
 
     write_low(data);
     delay(TIMEOUT_ACTION);
@@ -192,7 +171,7 @@ void EEPROM::write(WORD data) {
     delay(TIMEOUT_ACTION);
 }
 
-BYTE EEPROM::read_low() {
+byte_t EEPROM::read_low() {
     byte low = 0;
 
     pinMode(_data0, INPUT_PULLUP);
@@ -229,7 +208,7 @@ BYTE EEPROM::read_low() {
     return low;
 }
 
-BYTE EEPROM::read_high() {
+byte_t EEPROM::read_high() {
     byte high = 0;
 
     pinMode(_data0, INPUT_PULLUP);
@@ -266,7 +245,7 @@ BYTE EEPROM::read_high() {
     return high;
 }
 
-void EEPROM::write_low(BYTE data) {
+void EEPROM::write_low(byte_t data) {
     debugbreak("Low DATA -> WRITE");
 
     pinMode(_data0, OUTPUT);
@@ -318,7 +297,7 @@ void EEPROM::write_low(BYTE data) {
     pinMode(_data7, INPUT_PULLUP);
 }
 
-void EEPROM::write_high(BYTE data) {
+void EEPROM::write_high(byte_t data) {
     debugbreak("High DATA -> WRITE");
 
     pinMode(_data0, OUTPUT);

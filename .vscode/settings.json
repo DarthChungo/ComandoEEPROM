@@ -1,6 +1,23 @@
 {
     "files.associations": {
         "ranges": "cpp",
-        "condition_variable": "cpp"
+        "condition_variable": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "sstream": "cpp",
+        "stop_token": "cpp",
+        "streambuf": "cpp",
+        "exception": "cpp",
+        "memory_resource": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "*.rh": "cpp",
+        "algorithm": "cpp",
+        "memory": "cpp",
+        "numeric": "cpp",
+        "system_error": "cpp"
     }
 }
