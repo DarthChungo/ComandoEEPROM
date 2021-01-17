@@ -13,7 +13,8 @@ const options = {
     port:      args['port']     ||  args['p']  ||  false,
     send:      args['send']     ||  args['s']  ||  false,
     recieve:   args['recieve']  ||  args['r']  ||  false,
-    single:    args['single']   ||  args['s']  ||  false
+    low:       args['low']      ||  args['l']  ||  false,
+    high:      args['high']     ||  args['h']  ||  false
 };
 
 if (options['help']) {
@@ -26,7 +27,8 @@ if (options['help']) {
     console.log(' -p, --port    PORT  Specify port');
     console.log(' -s, --send    FILE  Send a file to the EEPROMs');
     console.log(' -r, --recieve FILE  Recieve to file from EEPROMS');
-    console.log(' -s, --single        Use lowest byte EEPROM only');
+    console.log(' -l, --low           Use lowest byte EEPROM only');
+    console.log(' -h, --high          Use highest byte EEPROM only');
 
     process.exit(0);
 }
@@ -52,16 +54,16 @@ if (options['send']) {
     try {
         send = fs.readFileSync(options['send']); 
     } catch (err) {
-        console.log('[Comando] Cannot read file.');
+        console.log('[Comando] Error, cannot read file.');
         process.exit(0);
     }
  
     
-    if (!options['single'] && send.length != 256*2) {
+    if (!(options['low'] || options['high']) && send.length != 512) {
         console.log('[Comando] Error, lenght of file is not exactly 512 bytes')
         process.exit(0);
         
-    } else if (options['single'] && send.length != 256) {
+    } else if ((options['low'] || options['high']) && send.length != 256) {
         console.log('[Comando] Error, lenght of file is not exactly 256 bytes')
         process.exit(0);
     }
@@ -72,9 +74,8 @@ console.log('[Comando] Starting COMANDO protocol version ' + version);
 const serial = new SerialPort(options['port'], { baudRate: 115200 });
 const parser = serial.pipe(new ByteLenght({ length: 2 }));
 
-var buff = Buffer.alloc(options['single'] ? 256 : 256*2);
+var buff = Buffer.alloc((options['low'] || options['high']) ? 256 : 256*2);
 var receiving = false;
-var debugging = false;
 var pos = 0;
 
 var ready = false;
@@ -95,7 +96,10 @@ serial.on('error', err => {
 
 parser.on('data', async data => {
     if (receiving) {
-        if (options['single']) {
+        if (options['high']) {
+            buff.writeUInt8(data[0], pos);
+
+        } else if (options['low']) {
             buff.writeUInt8(data[1], pos);
 
         } else {
@@ -141,7 +145,19 @@ parser.on('data', async data => {
 
                 console.log('[Comando] Sending WRITE data')
 
-                serial.write(send);
+                if (options['high']) {
+                    send.forEach(element => {
+                        serial.write([element, 0x00]);
+                    });
+
+                } else if (options['low']) {
+                    send.forEach(element => {
+                        serial.write([0x00, element]);
+                    });
+                    
+                } else {
+                    serial.write(send);
+                }
 
             } else {
                 console.log('[Comando] Terminating connection');
