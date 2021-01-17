@@ -1,4 +1,5 @@
 const args = require('command-line-parser')();
+const fs = require('fs');
 
 const SerialPort = require('serialport');
 const ByteLenght = require('@serialport/parser-byte-length');
@@ -55,16 +56,23 @@ serial.on('open', () => {
 
 serial.on('close', (err) => {
     console.log('[Serial] Closed port')
+    process.exit(0);
 })
 
 parser.on('data', data => {
     if (receiving) {
         if (lenght >= 255) {
             receiving = false;
-            console.log(buff);
+            
+            fs.writeFile(options['recieve'], buff, err => {});
+
+            console.log('[Comando] Finished recieving');
+
+            serial.write([0x10, 0x00]);
+            serial.close();
         
         } else {
-            buff.push((data[0]<<8) || data[1]);
+            buff.push((data[0]<<8) | data[1]);
             lenght++;
         }
 
@@ -83,8 +91,13 @@ parser.on('data', data => {
                 serial.close();
             }
 
-            serial.write([0x11, 0x00]);
-        } else if (data == [0x0200]) {
+            if (options['recieve']) {
+                serial.write([0x11, 0x00]);
+                console.log('[Comando] Initiated READ handshake, please wait');
+            }
+
+        } else if (data[0] == 0x02 && data[1] == 0x00) {
+            console.log('[Comando] Recieving READ data')
             receiving = true;
         }
     }
