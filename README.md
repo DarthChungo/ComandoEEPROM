@@ -40,6 +40,9 @@ SERVER sends exactly 256 WORDS with data
 Go back to (1)
 
 ### Write data to EEPROMs:<br>
-
+CLIENT sends 0x1200 WORD
+CLIENT sends exactly 256 WORDS with data
+SERVER sends 0x0300 WORD
+Go back to (1)
 
  </p>
