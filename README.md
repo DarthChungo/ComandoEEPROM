@@ -16,7 +16,7 @@ CLIENT represents the comando program.<br>
 SERVER represents the arduino controller.<br>
 All data transmitted as little endian.<br>
 BYTE represents 8 bits, WORD represents 16 bits.<br>
-The serial port will operate with a baud rate of 2000000<br>
+The serial port will operate with a baud rate of 115200<br>
 
 ### Start
 

@@ -8,7 +8,7 @@ EEPROM eeprom(14, 13, 9, 10, 12, 2, 3, 11, 17, 16, 15, 8, 7, 6, 5, 4);
 void setup() {
     eeprom.init();
 
-    Serial.begin(2000000);
+    Serial.begin(115200);
     Serial.write(0x01);
     Serial.write(version);
 }
@@ -30,9 +30,9 @@ void loop() {
         if (receiving) {
             buff[buffpos] = recv;
 
-            if (recv = 255) {
+            if (buffpos == 255) {
                 receiving = false;
-                
+
                 eeprom.write(buff);
 
                 Serial.write(0x03);
@@ -40,7 +40,7 @@ void loop() {
             }
 
             buffpos++;
-            
+
         } else {
             if (recv == 0x1000) {
                 Serial.end();
@@ -62,8 +62,8 @@ void loop() {
                     Serial.write(send[i] >> 8);
                     Serial.write(send[i] & 0x00FF);
                 } while (i++ < 0xFF);
-                
-            } else if (recv = 0x1200) {
+
+            } else if (recv == 0x1200) {
                 receiving = true;
             }
         }

@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const SerialPort = require('serialport');
 const ByteLenght = require('@serialport/parser-byte-length');
+const { Console } = require('console');
 
 const version = 1;
 
@@ -45,25 +46,54 @@ if (fs.existsSync(options['recieve'])) {
     }
 }
 
+var send;
+
+if (options['send']) {
+    try {
+        send = fs.readFileSync(options['send']); 
+    } catch (err) {
+        console.log('[Comando] Cannot read file.');
+        process.exit(0);
+    }
+ 
+    
+    if (!options['single'] && send.length != 256*2) {
+        console.log('[Comando] Error, lenght of file is not exactly 512 bytes')
+        process.exit(0);
+        
+    } else if (options['single'] && send.length != 256) {
+        console.log('[Comando] Error, lenght of file is not exactly 256 bytes')
+        process.exit(0);
+    }
+}
+
 console.log('[Comando] Starting COMANDO protocol version ' + version);
 
-const serial = new SerialPort(options['port'], { baudRate: 2000000 });
+const serial = new SerialPort(options['port'], { baudRate: 115200 });
 const parser = serial.pipe(new ByteLenght({ length: 2 }));
 
 var buff = Buffer.alloc(options['single'] ? 256 : 256*2);
 var receiving = false;
+var debugging = false;
 var pos = 0;
+
+var ready = false;
 
 serial.on('open', () => {
     console.log('[Serial] Oppened serial port');
 })
 
-serial.on('close', (err) => {
+serial.on('close', err => {
     console.log('[Serial] Closed port')
     process.exit(0);
 })
 
-parser.on('data', data => {
+serial.on('error', err => {
+    console.log(err);
+    process.exit(1);
+});
+
+parser.on('data', async data => {
     if (receiving) {
         if (options['single']) {
             buff.writeUInt8(data[1], pos);
@@ -87,31 +117,31 @@ parser.on('data', data => {
         } 
 
     } else {
-        if (data[0] == 0x01) {
+        if (data[0] == 0x01 && !ready) {
             console.log('[Comando] SERVER is ready');
             console.log('[Comando] SERVER is using protocol version ' + data[1]);
 
             if (data[1] != version) {
-                console.log('[Comando] Error, protoco versions do not match, giving up...')
+                console.log('[Comando] Error, protocol versions do not match, giving up...')
                 
                 console.log('[Comando] Terminating connection');
                 serial.write([0x10, 0x00]);
                 serial.close();
             }
 
+            ready = true;
+
             if (options['recieve']) {
+                console.log('[Comando] Initiating READ handshake');
                 serial.write([0x11, 0x00]);
-                console.log('[Comando] Initiated READ handshake');
 
             } else if (options['send']) {
+                console.log('[Comando] Initiating WRITE handshake');                
                 serial.write([0x12, 0x00]);
-                console.log('[Comando] Initiated WRITE handshake');
-                
+
                 console.log('[Comando] Sending WRITE data')
 
-                for (let i = 0; i != 256; i++) {
-                    serial.write([0x00, 0x00]); // TODO: Send correct data                 
-                }
+                serial.write(send);
 
             } else {
                 console.log('[Comando] Terminating connection');
@@ -119,10 +149,11 @@ parser.on('data', data => {
                 serial.close();
             }
 
-        } else if (data[0] == 0x02 && data[1] == 0x00) {
+        } else if (data[0] == 0x02 && data[1] == 0x00 && ready) {
             console.log('[Comando] Receiving READ data, please wait')
             receiving = true;
-        } else if (data[0] == 0x03 && data[1] == 0x00) {
+
+        } else if (data[0] == 0x03 && data[1] == 0x00 && ready) {
             console.log('[Comando] Done sending data');
             console.log('[Comando] Terminating connection');
             serial.write([0x10, 0x00]);
