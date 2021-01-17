@@ -7,11 +7,11 @@ const ByteLenght = require('@serialport/parser-byte-length');
 const version = 1;
 
 const options = {
-    help:        args['help']        || args['h'] || false,
-    interactive: args['interactive'] || args['i'] || false,
-    port:        args['port']        || args['p'] || false,
-    send:        args['send']        || args['s'] || false,
-    recieve:     args['recieve']     || args['r'] || false
+    help:      args['help']     ||  args['h']  ||  false,
+    port:      args['port']     ||  args['p']  ||  false,
+    send:      args['send']     ||  args['s']  ||  false,
+    recieve:   args['recieve']  ||  args['r']  ||  false,
+    single:    args['single']   ||  args['s']  ||  false
 };
 
 if (options['help'] || args.lenght == 0) {
@@ -21,22 +21,21 @@ if (options['help'] || args.lenght == 0) {
     console.log('');
     console.log('Available arguments:');
     console.log(' -h, --help          Show this information');
-    console.log(' -i, --interactive   Use interactive mode to send data');
-    console.log(' -p, --port PORT     Specify port');
-    console.log(' -s, --send FILE     Send a file to the EEPROMs');
+    console.log(' -p, --port    PORT  Specify port');
+    console.log(' -s, --send    FILE  Send a file to the EEPROMs');
     console.log(' -r, --recieve FILE  Recieve to file from EEPROMS');
+    console.log(' -s, --single        Use lowest byte EEPROM only');
 
-    process.exit(1);
-}
-
-if (options['interactive']) {
-    console.log('comando: not implemented');
     process.exit(1);
 }
 
 if (!options['port']) {
-    console.log('commando: no port specified');
+    console.log('[Comando] No port specified');
     process.exit(1);
+}
+
+if (!(options['send'] | options['recieve'])) {
+    console.log('[Comando] Warning, neither sending nor receiving data-');
 }
 
 console.log('[Comando] Starting COMANDO protocol version ' + version);
@@ -46,8 +45,8 @@ const parser = serial.pipe(new ByteLenght({ length: 2 }));
 
 var receiving = false;
 var sending = false;
-var lenght = 0;
-var buff = [];
+var buff = Buffer.alloc(256*2);
+var pos = 0;
 
 serial.on('open', () => {
     console.log('[Serial] Oppened serial port');
@@ -61,20 +60,19 @@ serial.on('close', (err) => {
 
 parser.on('data', data => {
     if (receiving) {
-        if (lenght >= 255) {
+        buff.writeUInt8(data[0], (pos*2)  );
+        buff.writeUInt8(data[1], (pos*2)+1);
+        pos++;
+
+        if (pos == 256) {
             receiving = false;
             
-            fs.writeFile(options['recieve'], buff, err => {});
-
+            fs.writeFile(options['recieve'], buff, 'binary', err => {});
             console.log('[Comando] Finished recieving');
 
             serial.write([0x10, 0x00]);
             serial.close();
-        
-        } else {
-            buff.push((data[0]<<8) | data[1]);
-            lenght++;
-        }
+        } 
 
     } else if (sending) {
 
@@ -85,7 +83,7 @@ parser.on('data', data => {
             console.log('[Comando] SERVER is using protocol version ' + data[1]);
 
             if (data[1] != version) {
-                console.log('[Comando] PROTOCOL VERSION DOES NOT MATCH, giving up...')
+                console.log('[Comando] Error, protoco versions do not match, giving up...')
                 
                 serial.write([0x10, 0x00]);
                 serial.close();
@@ -94,6 +92,12 @@ parser.on('data', data => {
             if (options['recieve']) {
                 serial.write([0x11, 0x00]);
                 console.log('[Comando] Initiated READ handshake');
+            } else if (options['send']) {
+
+
+            } else {
+                serial.write([0x10, 0x00]);
+                serial.close();
             }
 
         } else if (data[0] == 0x02 && data[1] == 0x00) {
