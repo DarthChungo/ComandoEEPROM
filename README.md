@@ -31,11 +31,13 @@ CLIENT may now... (1)<br>
 CLIENT sends 0x1000 WORD
 SERVER closes the serial port
 CLIENT closes the serial port
+Go back to (1)
 
 ### Read data from EEPROMs:<br>
 CLIENT sends 0x1100 WORD
 SERVER sends 0x0200 WORD
 SERVER sends exactly 256 WORDS with data
+Go back to (1)
 
 ### Write data to EEPROMs:<br>
 
