@@ -1,4 +1,5 @@
 const args = require('command-line-parser')();
+const promt = require('prompt-sync')();
 const fs = require('fs');
 
 const SerialPort = require('serialport');
@@ -34,8 +35,14 @@ if (!options['port']) {
     process.exit(1);
 }
 
-if (!(options['send'] | options['recieve'])) {
-    console.log('[Comando] Warning, neither sending nor receiving data-');
+if (!(options['send'] || options['recieve'])) {
+    console.log('[Comando] Warning, neither sending nor receiving data');
+}
+
+if (fs.existsSync(options['recieve'])) {
+    if (promt('[Comando] Warning, file ' + options['recieve'] + ' exists, overwrite? (y/N) ') != 'y') {
+        process.exit(1);
+    }
 }
 
 console.log('[Comando] Starting COMANDO protocol version ' + version);
@@ -92,10 +99,12 @@ parser.on('data', data => {
             if (options['recieve']) {
                 serial.write([0x11, 0x00]);
                 console.log('[Comando] Initiated READ handshake');
+
             } else if (options['send']) {
 
 
             } else {
+                console.log('[Comando] Terminating connection');
                 serial.write([0x10, 0x00]);
                 serial.close();
             }
