@@ -7,13 +7,13 @@
  *    ACO Accumulator Out
  *
  *    ALS ALU Subtract
- *
+ *    FRI Flags Register In
+ * 
  *    OTI Output Register In
  *
  *    PCO Program Counter Out
  *    PCI Program Counter Increment
  *    PCJ Program Counter Branch
- *    PCN Program Counter Branch Negate
  *    PCZ Program Counter Branch (if zero)
  *    PCF Program Counter Branch (if overflow)
  *
@@ -80,7 +80,7 @@
  *    0010       0011          PCI
  *    0011       0011          PCO MRI
  *    0100       0011          RMO MRI
- *    0101       0011          RMO ACI PCI
+ *    0101       0011          RMO ACI FRI PCI
  *    0110       0011          CLR
  *
  *    SBA Subtract to Accumulator from Address
@@ -88,7 +88,7 @@
  *    0010       0100          PCI
  *    0011       0100          PCO MRI
  *    0100       0100          RMO MRI
- *    0101       0100          RMO ACI ALS PCI
+ *    0101       0100          RMO ACI ALS FRI PCI
  *    0110       0100          CLR
  *
  *    JPO Jump to Address if Overflow
@@ -137,28 +137,28 @@
  *
  *    0010       1011          PCI
  *    0010       1011          PCO MRI
- *    0010       1011          RMO ACI PCI
+ *    0010       1011          RMO ACI FRI PCI
  *    0010       1011          CLR
  *
  *    SBI Subtract to Accumulator from Imidiate
  *
  *    0010       1100          PCI
  *    0010       1100          PCO MRI
- *    0010       1100          RMO ACI ALS PCI
+ *    0010       1100          RMO ACI ALS FRI PCI
  *    0010       1100          CLR
  *
  *    JNO Jump to Address if not Overflow
  *
  *    0010       1101          PCI
  *    0011       1101          PCO MRI
- *    0100       1101          RMO PCO PCN
+ *    0100       1101          RMO PCO PCJ
  *    0101       1101          CLR
  *
  *    JNZ Jump to Address if not Zero
  *
  *    0010       1110          PCI
  *    0011       1110          PCO MRI
- *    0100       1110          RMO PCZ PCN
+ *    0100       1110          RMO PCZ PCJ
  *    0101       1110          CLR
  *
  *    OTC Output Accumulator
@@ -172,28 +172,44 @@
 #include <fstream>
 #include <cstring>
 
-uint8_t microcode[512];
+#define HLT 0b0000000000000001
+#define ACI 0b0000000000000010
+#define ACO 0b0000000000000100
+#define ALS 0b0000000000001000
+#define FRI 0b0000000000010000
+#define OTI 0b0000000000100000
+#define PCO 0b0000000001000000
+#define PCI 0b0000000010000000
+#define PCJ 0b0000000100000000
+#define PCZ 0b0000001000000000
+#define PCF 0b0000010000000000
+#define MRI 0b0000100000000000
+#define RMI 0b0001000000000000
+#define RMO 0b0010000000000000
+#define IRI 0b0100000000000000
+#define CLR 0b1000000000000000
 
-void create_op(uint8_t* mc, uint8_t opcode) {
+#define CW_OFF 0b0000000000000000 // Some bits might be active low, this represents the inactive position for all bits
+#define CW(bits) CW_OFF ^= bits   // To make the appropiate control word we just flip the bits that we want to be active
 
-}
+uint16_t microcode[512];
 
-void set_cw(uint8_t* mc, uint16_t cw) {
 
-}
 
 int main() {
   std::ofstream out;
 
-  std::memset((void*) microcode, 0x00, sizeof(uint8_t) * 512);
+  std::memset((void*) microcode, 0, sizeof(uint8_t) * 512);
 
   // Test
-  uint8_t i = 0;
-  do {
-    microcode[(i*2)] = i;
-    microcode[(i*2)+1] = ~i;
-  } while (i++ < 0xFF);
+  // uint8_t i = 0;
 
+  // do {
+  //   microcode[i] = ~i | i;
+  // } while (i++ < 0xFF);
+
+  microcode[0] = 0x1234;
+  microcode[255] = 0x5678;
 
   out.open("microcode.rom", std::ofstream::binary);
   out.write((char*) microcode, sizeof(uint8_t) * 512);

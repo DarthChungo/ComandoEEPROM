@@ -1,2 +1,3 @@
-comando/node_modules/
-.vscode/
+/comando/node_modules/*
+/.vscode/*
+/maker/build/*
