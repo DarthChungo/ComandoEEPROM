@@ -94,7 +94,7 @@ serial.on('error', err => {
     process.exit(1);
 });
 
-parser.on('data', async data => {
+parser.on('data', data => {
     if (receiving) {
         if (options['high']) {
             buff.writeUInt8(data[0], pos);
