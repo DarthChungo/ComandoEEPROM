@@ -38,7 +38,7 @@
  *
  *    1000 JMP  <Addr>  Jump to Address
  *    1001 LDI  <Data>  Load from Imidiate into Accumulator
- *    1010 NOP  <Data>  No Operation
+ *    1010 NOP          No Operation
  *    1011 ADI  <Data>  Add to Accumulator from Imidiate
  *    1100 SBI  <Data>  Subtract to Accumulator from Imidiate
  *    1101 JNO  <Addr>  Jump to Address if not Overflow
@@ -172,44 +172,53 @@
 #include <fstream>
 #include <cstring>
 
-#define HLT 0b0000000000000001
+#define FRI 0b0000000000000001
 #define ACI 0b0000000000000010
-#define ACO 0b0000000000000100
-#define ALS 0b0000000000001000
-#define FRI 0b0000000000010000
-#define OTI 0b0000000000100000
-#define PCO 0b0000000001000000
+#define HLT 0b0000000000000100
+#define PCO 0b0000000000001000
+#define OTI 0b0000000000010000
+#define ALS 0b0000000000100000
+#define PCJ 0b0000000001000000
 #define PCI 0b0000000010000000
-#define PCJ 0b0000000100000000
-#define PCZ 0b0000001000000000
-#define PCF 0b0000010000000000
-#define MRI 0b0000100000000000
-#define RMI 0b0001000000000000
-#define RMO 0b0010000000000000
+#define ACO 0b0000000100000000
+#define PCF 0b0000001000000000
+#define PCZ 0b0000010000000000
+#define RMI 0b0000100000000000
+#define RMO 0b0001000000000000
+#define MRI 0b0010000000000000
 #define IRI 0b0100000000000000
 #define CLR 0b1000000000000000
 
-#define CW_OFF 0b0000000000000000 // Some bits might be active low, this represents the inactive position for all bits
-#define CW(bits) CW_OFF ^= bits   // To make the appropiate control word we just flip the bits that we want to be active
+// Some bits might be active low, this represents the inactive position for all bits
+// To make the appropiate control word we just flip the bits that we want to be active
 
-uint16_t microcode[512];
+#define CWI 0b0111000100011111 
+#define CWH(bits) ((CWI ^ (bits)) >> 8)
+#define CWL(bits) ((CWI ^ (bits)) & 0x00FF)
 
-
+uint8_t microcode[512];
 
 int main() {
   std::ofstream out;
+  uint8_t i = 0;
 
   std::memset((void*) microcode, 0, sizeof(uint8_t) * 512);
 
-  // Test
-  // uint8_t i = 0;
+  do {
+    microcode[i*2  ] = CWH(CLR);
+    microcode[i*2+1] = CWL(CLR);
+  } while (i++ < 0xFF);
 
-  // do {
-  //   microcode[i] = ~i | i;
-  // } while (i++ < 0xFF);
+  do {
+    microcode[(0b00000000+i)*2  ] = CWH(PCO|MRI);
+    microcode[(0b00000000+i)*2+1] = CWL(PCO|MRI);
+    
+    microcode[(0b00010000+i)*2  ] = CWH(RMO|IRI);
+    microcode[(0b00010000+i)*2+1] = CWL(RMO|IRI);
+  } while (i++ < 0xF);
 
-  microcode[0] = 0x1234;
-  microcode[255] = 0x5678;
+  microcode[(0b00100000*2)  ] = CWH(HLT);
+  microcode[(0b00100000*2)+1] = CWL(HLT); 
 
   out.open("microcode.rom", std::ofstream::binary);
   out.write((char*) microcode, sizeof(uint8_t) * 512);

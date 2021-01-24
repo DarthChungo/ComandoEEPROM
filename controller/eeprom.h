@@ -7,7 +7,7 @@
 #define TIMEOUT_READ    150
 #define TIMEOUT_WRITE   150
 #define TIMEOUT_ENABLE  150
-#define TIMEOUT_ACTION  7
+#define TIMEOUT_ACTION  15
 #define TIMEOUT_READY   250
 
 class EEPROM {
