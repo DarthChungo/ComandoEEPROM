@@ -95,15 +95,17 @@
  *
  *    0010       0101          PCI
  *    0011       0101          PCO MRI
- *    0100       0101          RMO PCO
- *    0101       0101          CLR
+ *    0100       0101          PCI
+ *    0101       0101          RMO PCO
+ *    0110       0101          CLR
  *
  *    JPZ Jump to Address if Zero
  *
  *    0010       0110          PCI
  *    0011       0110          PCO MRI
- *    0100       0110          RMO PCZ
- *    0101       0110          CLR
+ *    0100       0110          PCI
+ *    0101       0110          RMO PCZ
+ *    0110       0110          CLR
  *
  *    OTA Output Memory at Address
  *
@@ -151,15 +153,17 @@
  *
  *    0010       1101          PCI
  *    0011       1101          PCO MRI
- *    0100       1101          RMO PCO PCJ
- *    0101       1101          CLR
+ *    0100       1101          PCI
+ *    0101       1101          RMO PCO PCJ
+ *    0110       1101          CLR
  *
  *    JNZ Jump to Address if not Zero
  *
  *    0010       1110          PCI
  *    0011       1110          PCO MRI
- *    0100       1110          RMO PCZ PCJ
- *    0101       1110          CLR
+ *    0100       1110          PCI
+ *    0101       1110          RMO PCZ PCJ
+ *    0110       1110          CLR
  *
  *    OTC Output Accumulator
  *
@@ -293,8 +297,11 @@ int main() {
   microcode[(0b00110101*2)  ] = CWH(PCO|MRI);
   microcode[(0b00110101*2)+1] = CWL(PCO|MRI);
 
-  microcode[(0b01000101*2)  ] = CWH(RMO|PCO);
-  microcode[(0b01000101*2)+1] = CWL(RMO|PCO);
+  microcode[(0b01000101*2)  ] = CWH(PCI);
+  microcode[(0b01000101*2)+1] = CWL(PCI);
+
+  microcode[(0b01010101*2)  ] = CWH(RMO|PCF);
+  microcode[(0b01010101*2)+1] = CWL(RMO|PCF);
 
   // JPZ Jump to Address if Zero
 
@@ -304,8 +311,11 @@ int main() {
   microcode[(0b00110110*2)  ] = CWH(PCO|MRI);
   microcode[(0b00110110*2)+1] = CWL(PCO|MRI);
 
-  microcode[(0b01000110*2)  ] = CWH(RMO|PCZ);
-  microcode[(0b01000110*2)+1] = CWL(RMO|PCZ);
+  microcode[(0b01000110*2)  ] = CWH(PCI);
+  microcode[(0b01000110*2)+1] = CWL(PCI);
+
+  microcode[(0b01010110*2)  ] = CWH(RMO|PCZ);
+  microcode[(0b01010110*2)+1] = CWL(RMO|PCZ);
 
   // OTA Output Memory at Address
 
@@ -381,8 +391,11 @@ int main() {
   microcode[(0b00111101*2)  ] = CWH(PCO|MRI);
   microcode[(0b00111101*2)+1] = CWL(PCO|MRI);
 
-  microcode[(0b01001101*2)  ] = CWH(RMO|PCO|PCJ);
-  microcode[(0b01001101*2)+1] = CWL(RMO|PCO|PCJ);
+  microcode[(0b01001101*2)  ] = CWH(PCI);
+  microcode[(0b01001101*2)+1] = CWL(PCI);
+
+  microcode[(0b01011101*2)  ] = CWH(RMO|PCF|PCJ);
+  microcode[(0b01011101*2)+1] = CWL(RMO|PCF|PCJ);
 
   // JNZ Jump to Address if not Zero
 
@@ -392,8 +405,11 @@ int main() {
   microcode[(0b00111110*2)  ] = CWH(PCO|MRI);
   microcode[(0b00111110*2)+1] = CWL(PCO|MRI);
 
-  microcode[(0b01001110*2)  ] = CWH(RMO|PCZ|PCJ);
-  microcode[(0b01001110*2)+1] = CWL(RMO|PCZ|PCJ);
+  microcode[(0b01001110*2)  ] = CWH(PCI);
+  microcode[(0b01001110*2)+1] = CWL(PCI);
+
+  microcode[(0b01011110*2)  ] = CWH(RMO|PCZ|PCJ);
+  microcode[(0b01011110*2)+1] = CWL(RMO|PCZ|PCJ);
 
   // OTC Output Accumulator
 
