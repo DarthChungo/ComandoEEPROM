@@ -27,23 +27,23 @@
  *
  *  List of all instructions:
  *
- *    0000 HLT          Halt System Clock
- *    0001 LDA  <Addr>  Load from Adress into Accumulator
- *    0010 STA  <Addr>  Store from Accumulator into Address
- *    0011 ADA  <Addr>  Add to Accumulator from Address
- *    0100 SBA  <Addr>  Subtract to Accumulator from Address
- *    0101 JPO  <Addr>  Jump to Address if Overflow
- *    0110 JPZ  <Addr>  Jump to Address if Zero
- *    0111 OTA  <Addr>  Output Memory at Address
+ *    0 0000 HLT          Halt System Clock
+ *    1 0001 LDA  <Addr>  Load from Adress into Accumulator
+ *    2 0010 STA  <Addr>  Store from Accumulator into Address
+ *    3 0011 ADA  <Addr>  Add to Accumulator from Address
+ *    4 0100 SBA  <Addr>  Subtract to Accumulator from Address
+ *    5 0101 JPO  <Addr>  Jump to Address if Overflow
+ *    6 0110 JPZ  <Addr>  Jump to Address if Zero
+ *    7 0111 OTA  <Addr>  Output Memory at Address
  *
- *    1000 JMP  <Addr>  Jump to Address
- *    1001 LDI  <Data>  Load from Imidiate into Accumulator
- *    1010 NOP          No Operation
- *    1011 ADI  <Data>  Add to Accumulator from Imidiate
- *    1100 SBI  <Data>  Subtract to Accumulator from Imidiate
- *    1101 JNO  <Addr>  Jump to Address if not Overflow
- *    1110 JNZ  <Addr>  Jump to Address if not Zero
- *    1111 OTC          Output Accumulator
+ *    8 1000 JMP  <Addr>  Jump to Address
+ *    9 1001 LDI  <Data>  Load from Imidiate into Accumulator
+ *    A 1010 NOP          No Operation
+ *    B 1011 ADI  <Data>  Add to Accumulator from Imidiate
+ *    C 1100 SBI  <Data>  Subtract to Accumulator from Imidiate
+ *    D 1101 JNO  <Addr>  Jump to Address if not Overflow
+ *    E 1110 JNZ  <Addr>  Jump to Address if not Zero
+ *    F 1111 OTC          Output Accumulator
  *
  *
  *  Instruction Explanation:
