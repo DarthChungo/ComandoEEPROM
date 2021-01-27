@@ -1,64 +1,96 @@
-Load X into ACC
-Add Y to ACC
-Jump to Halt if Overflow
+x = 1
+y = 0
+
+loop
+
+z = x + y
+x = y
+y = z
+
+repeat
+
+------------------
+
+Set ACC to 1
+Store in X
+Set ACC to 0
+Store in Y
+
+[0]
+Load X
+Add Y
+Jump to [1] if overflow
 Output ACC
-Store ACC into Z
-Load Y into ACC
-Store ACC into X
-Load Z into ACC
-Store ACC into Y
-Jump to start
+Store Z
+Load Y
+Store X
+Load Z
+Store Y
+Jump to [0]
+
+[1]
 Halt
 
-0000 0000 : 0001 0000 LDA
-0000 0001 : 0001 0100
-0000 0010 : 0011 0000 ADA
-0000 0011 : 0001 0101
-0000 0100 : 0101 0000 JPO
-0000 0101 : 0001 0011
-0000 0110 : 1111 0000 OTC
-0000 0111 : 0010 0000 STA
-0000 1000 : 0001 0110
-0000 1001 : 0001 0000 LDA
-0000 1010 : 0001 0101
-0000 1011 : 0010 0000 STA
-0000 1100 : 0001 0100
-0000 1101 : 0001 0000 LDA
-0000 1110 : 0001 0110
-0000 1111 : 0010 0000 STA
-0001 0000 : 0001 0101
-0001 0001 : 1000 0000 JMP
-0001 0010 : 0000 0000
-0001 0011 : 0000 0000 HLT
-0001 0100 : 0000 0001 (X)
-0001 0101 : 0000 0000 (Y)
-0001 0110 : 0000 0000 (Z)
-0001 0111 : 0000 0000
-         ···
-1111 1111 : 0000 0000
+[X]
+[Y]
+[Z]
 
-00: 10 LDA
-01: 13
-02: 30 ADA
-03: 14
-04: 50 JPO
-05: 12
-06: F0 OTC
-07: 20 STA
-08: 15
-09: 10 LDA
-0A: 14
-0B: 20 STA
-0C: 13
-0D: 10 LDA
-0E: 15
-0F: 20 STA
-10: 14
-11: 80 JMP
-12: 00 HLT
-13: 01 (X)
-14: 00 (Y)
-15: 00 (Z)
-16: 00
- ···
-FF: 00
+------------------
+
+LDI 1
+STA X
+LDI 0
+STA Y
+
+[0]
+LDA X
+ADA Y
+JPO [1]
+OTC
+STA Z
+
+LDA Y
+STA X
+LDA Z
+STA Y
+JMP [0]
+
+[1]
+HLT
+
+-----------------
+
+00 : 90 LDI
+01 : 01 %1
+02 : 20 STA
+03 : 1C $X
+04 : 90 LDI
+05 : 00 %0
+06 : 20 STA
+07 : 1D $Y
+08 : 10 LDA (0)
+09 : 1C $X
+0A : 30 ADA
+0B : 1D $Y
+0C : 50 JPO
+0D : 1E $1
+0E : F0 OTC
+0F : 20 STA
+10 : 1E $Z
+11 : 10 LDA
+12 : 1D $Y
+13 : 20 STA
+14 : 1C $X
+15 : 10 LDA
+16 : 1E $Z
+17 : 20 STA
+18 : 00 $Y
+19 : 80 JMP
+1A : 08 $0
+1B : 00 HLT (1)
+1C : 00     (X)
+1D : 00     (Y)
+1E : 00     (Z)
+1F : 00
+  ···
+FF : 00

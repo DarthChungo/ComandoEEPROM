@@ -255,8 +255,8 @@ int main() {
   microcode[(0b00110010*2)  ] = CWH(PCO|MRI);
   microcode[(0b00110010*2)+1] = CWL(PCO|MRI);
 
-  microcode[(0b01000010*2)  ] = CWH(RMO|RMI);
-  microcode[(0b01000010*2)+1] = CWL(RMO|RMI);
+  microcode[(0b01000010*2)  ] = CWH(RMO|MRI);
+  microcode[(0b01000010*2)+1] = CWL(RMO|MRI);
 
   microcode[(0b01010010*2)  ] = CWH(ACO|RMI|PCI);
   microcode[(0b01010010*2)+1] = CWL(ACO|RMI|PCI);

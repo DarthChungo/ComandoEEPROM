@@ -1,16 +1,19 @@
+Load X into ACC
 Add 1 to ACC
 Store ACC in X
 Load 0 into ACC
-Load X into Acc
+Load X into ACC
 Halt
 
-00 : B0
-01 : 01
-02 : 20
-03 : 09
-04 : 90
-05 : 00
-06 : 10
-07 : 09
-08 : 00
-09 : 00
+00 : 10
+01 : 0B
+02 : B0
+03 : 01
+04 : 20
+05 : 0B
+06 : 90
+07 : 00
+08 : 10
+09 : 0B
+0A : 00
+0B : 00
