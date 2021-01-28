@@ -73,7 +73,7 @@ HLT
 0A : 30 ADA
 0B : 1D %Y
 0C : 50 JPO
-0D : 1E %1
+0D : 1B %1
 0E : F0 OTC
 0F : 20 STA
 10 : 1E %Z
@@ -84,7 +84,7 @@ HLT
 15 : 10 LDA
 16 : 1E %Z
 17 : 20 STA
-18 : 00 %Y
+18 : 1D %Y
 19 : 80 JMP
 1A : 08 %0
 1B : 00 HLT (1)
