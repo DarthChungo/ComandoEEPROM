@@ -203,7 +203,6 @@
 uint8_t microcode[512];
 
 int main() {
-  std::ofstream out;
   uint8_t i = 0;
 
   std::memset((void*) microcode, 0, sizeof(uint8_t) * 512);
@@ -417,9 +416,22 @@ int main() {
   microcode[(0b00101111*2)+1] = CWL(ACO|OTI|PCI);
 
 
+  std::ofstream out;
   out.open("microcode.rom", std::ofstream::binary);
   out.write((char*) microcode, sizeof(uint8_t) * 512);
   out.close();
+
+  std::ofstream outl, outh;
+  outl.open("microcode_low.rom", std::ofstream::binary);
+  outh.open("microcode_high.rom", std::ofstream::binary);
+
+  do {
+    outh.write((char*) &microcode[i*2  ], 1);
+    outl.write((char*) &microcode[i*2+1], 1);
+  } while (i++ < 0xFF);
+
+  outl.close();
+  outh.close();
 
   return 0;
 }
