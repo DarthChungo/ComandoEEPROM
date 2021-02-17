@@ -425,6 +425,8 @@ int main() {
   outl.open("microcode_low.rom", std::ofstream::binary);
   outh.open("microcode_high.rom", std::ofstream::binary);
 
+  i = 0;
+
   do {
     outh.write((char*) &microcode[i*2  ], 1);
     outl.write((char*) &microcode[i*2+1], 1);
