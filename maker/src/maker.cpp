@@ -203,9 +203,8 @@
 uint8_t microcode[512];
 
 int main() {
-  uint8_t i = 0;
-
   std::memset((void*) microcode, 0, sizeof(uint8_t) * 512);
+  uint8_t i = 0;
 
   // Ensure invalid locations redirect back to a valid instruction code
 
@@ -428,8 +427,8 @@ int main() {
   i = 0;
 
   do {
-    outh.write((char*) &microcode[i*2  ], 1);
-    outl.write((char*) &microcode[i*2+1], 1);
+    outh.put(microcode[i*2  ]);
+    outl.put(microcode[i*2+1]);
   } while (i++ < 0xFF);
 
   outl.close();

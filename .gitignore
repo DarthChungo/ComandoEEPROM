@@ -1,3 +1,4 @@
-/comando/node_modules/*
-/.vscode/*
-/maker/build/*
+./comando/node_modules/*
+./.vscode/*
+./maker/build/*
+./comando/temp.rom
